@@ -15,11 +15,22 @@ import org.apache.hadoop.util.ToolRunner;
 import org.xml.sax.InputSource;
 
 import javax.xml.parsers.SAXParser;
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.Attribute;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
+import javax.xml.transform.Source;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringReader;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 
@@ -33,6 +44,8 @@ public class FilterBrazilians extends Configured implements Tool {
 
         System.exit(exitCode);
     }
+
+    public static int countUsers = 0;
 
     @Override
     public int run(String[] args) throws Exception {
@@ -48,7 +61,7 @@ public class FilterBrazilians extends Configured implements Tool {
         job.setMapperClass(FilterBraziliansMapper.class);
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-
+        job.setNumReduceTasks(0);
 
         FileInputFormat.setInputPaths(job, new Path(args[0]));
         FileOutputFormat.setOutputPath(job, new Path(args[1]));
@@ -61,6 +74,7 @@ public class FilterBrazilians extends Configured implements Tool {
 
     public static class FilterBraziliansMapper extends Mapper<Object, Text, NullWritable, String> {
 
+        public static final String XML_TAG_NAME = "row";
         private String regexFilter;
 
         @Override
@@ -74,32 +88,61 @@ public class FilterBrazilians extends Configured implements Tool {
 
             String linha = value.toString();
 
-//            final Map<String, String> propertiesOfXml = TransformationUtils.transformXmlToMap(linha);
+            Map<String, String> xmlAttributes = new HashMap<String, String>();
+            try {
+                if (linha.contains("<row")) {
+                    xmlAttributes = convertXmlBufferToMap(new ByteArrayInputStream(linha
+                            .getBytes()));
+                }
+            } catch (XMLStreamException e) {
+                System.out.println(e.getMessage());
+            }
 
-            String locationExtracted = retrievingLocation(linha);
 
             System.out.println("O que tem em linha: " + linha);
 
-            if (locationExtracted.equalsIgnoreCase("") == false) {
-                if (locationExtracted.toLowerCase().matches(regexFilter)) {
-                    //TODO implementar a saída para mostrar o atributo correto do XML.
-                    context.write(NullWritable.get(), value.toString());
+            if (xmlAttributes.size() > 0) {
+                if (xmlAttributes.containsKey("Location")) {
+                    String locationExtracted = xmlAttributes.get("Location");
+                    if (locationExtracted.toLowerCase().matches(regexFilter)) {
+                        FilterBrazilians.countUsers++;
+                        System.out.println("Usuario " + xmlAttributes.get("DisplayName") + " e brasileiro");
+                        context.write(NullWritable.get(), xmlAttributes.get("DisplayName"));
+                    }
+                    System.out.println("Tem no map? " + locationExtracted);
+
                 }
             }
+
         }
 
-        private String retrievingLocation(String linha) {
-            XPath xpath = XPathFactory.newInstance().newXPath();
-            InputSource input = new InputSource(new StringReader(linha));
-            try {
-                String locationResult = xpath.evaluate("//*[1]/@Location", input);
-                System.out.println("Location result: " + locationResult);
-                return locationResult;
-            } catch (XPathExpressionException e) {
-                System.out.println(e.getMessage());
+        private Map<String, String> convertXmlBufferToMap(InputStream input) throws XMLStreamException {
+
+            XMLEventReader eventReader = XMLInputFactory.newFactory().createXMLEventReader(input);
+            final Map<String, String> attributesMap = new HashMap<String, String>();
+
+            while(eventReader.hasNext()) {
+                XMLEvent event = eventReader.nextEvent();
+
+                if (event.isStartElement()) {
+                    final StartElement startElement = event.asStartElement();
+
+                    if (startElement.getName().getLocalPart() == XML_TAG_NAME) {
+                        Iterator<Attribute> attributes = startElement.getAttributes();
+
+                        while (attributes.hasNext()) {
+                            final Attribute attr = attributes.next();
+                            attributesMap.put(attr.getName().toString(), attr.getValue().toString());
+                        }
+                    }
+
+                }
+
             }
-            return "";
+
+            return attributesMap;
         }
+
     }
 
 

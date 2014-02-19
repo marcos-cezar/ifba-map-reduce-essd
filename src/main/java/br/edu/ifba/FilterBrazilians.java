@@ -82,6 +82,7 @@ public class FilterBrazilians extends Configured implements Tool {
 
             if (locationExtracted.equalsIgnoreCase("") == false) {
                 if (locationExtracted.toLowerCase().matches(regexFilter)) {
+                    //TODO implementar a saída para mostrar o atributo correto do XML.
                     context.write(NullWritable.get(), value.toString());
                 }
             }

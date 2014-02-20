@@ -18,7 +18,6 @@ import java.util.Map;
  */
 public class PostsJoinMapper extends Mapper<Object, Text, Text, Text> {
 
-    private final String tagPattern = "<row";
 
     private Text outKey = new Text();
     private Text outValue = new Text();
@@ -32,16 +31,22 @@ public class PostsJoinMapper extends Mapper<Object, Text, Text, Text> {
 
         try {
 
-            if (linha.contains(tagPattern)) {
+            if (linha.contains(InformationExtractorUtils.STACK_TAG_NAME)) {
 
                 Map<String, String> mappedAttributesFromXml = InformationExtractorUtils
-                        .extractAttributesFromXmlTagIntoMap(new ByteArrayInputStream(linha.getBytes()), tagPattern);
+                        .extractAttributesFromXmlTagIntoMap(new ByteArrayInputStream(linha.getBytes()), InformationExtractorUtils.STACK_TAG_NAME);
 
 
-                if (mappedAttributesFromXml.containsKey("UserId")) {
+                final String userId = "UserId";
+
+                if (mappedAttributesFromXml.containsKey(userId)) {
+                    outKey.set(mappedAttributesFromXml.get(userId));
+                    outValue.set("P" + mappedAttributesFromXml.get(linha));
+
 
                 }
 
+                context.write(outKey, outValue);
 
             }
 

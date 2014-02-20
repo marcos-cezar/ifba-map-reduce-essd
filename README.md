@@ -1,4 +1,4 @@
-![color black](http://www.wiki.ifba.edu.br/gsort/show_image.php?id=2&scalesize=o)
+![](https://dl.dropboxusercontent.com/u/7022817/gsort-logo-blue-back.png)
 
 Atividade Complementar Hadoop
 =============================

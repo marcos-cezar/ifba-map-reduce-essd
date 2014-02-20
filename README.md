@@ -1,3 +1,5 @@
+![](http://www.wiki.ifba.edu.br/gsort/show_image.php?id=2&scalesize=o)
+
 Atividade Complementar Hadoop
 =============================
 

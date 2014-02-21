@@ -30,7 +30,19 @@ public class TopTenBrazilianPosters extends Configured implements Tool {
     public int run(String[] args) throws Exception {
 
 
+        if (args.length < 3) {
+            System.out.println("TopTenBrazilianPosters deve ser utilizado assim: TopTenBrazilianPosters <in file> <out folder>");
+            System.exit(1);
+        }
+
+
         Job job = new Job();
+
+        job.setJobName(getClass().getName());
+        job.setJarByClass(TopTenBrazilianPosters.class);
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
+
 
 //        MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, );
 //        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, );
@@ -38,38 +50,5 @@ public class TopTenBrazilianPosters extends Configured implements Tool {
 
         return 0;
     }
-
-    public static class TopTenBrazilianPostersMapper extends Mapper<Object, Text, Text, Text> {
-
-        private Text outKey = new Text();
-        private Text outValue = new Text();
-
-        @Override
-        protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-
-            String line = value.toString();
-            Map<String, String> mappedAttributes = new HashMap<String, String>();
-
-            try {
-                if (line.contains(InformationExtractorUtils.STACK_TAG_NAME)) {
-                    mappedAttributes = InformationExtractorUtils.extractAttributesFromXmlTagIntoMap(new ByteArrayInputStream(line.getBytes()), InformationExtractorUtils.STACK_TAG_NAME);
-                }
-            } catch (XMLStreamException e) {
-                System.out.println(e.getMessage());
-            }
-
-            if (mappedAttributes.containsKey("UserId")) {
-                if (mappedAttributes.containsKey("Location") && mappedAttributes.get("Location").matches(InformationExtractorUtils.REGEX_FILTER)) {
-
-                    outKey.set(mappedAttributes.get("UserId"));
-                    outValue.set("TBP" + value.toString());
-
-                }
-            }
-
-
-        }
-    }
-
 
 }

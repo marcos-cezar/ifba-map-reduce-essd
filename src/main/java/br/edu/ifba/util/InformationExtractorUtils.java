@@ -23,6 +23,8 @@ public class InformationExtractorUtils {
 
     public static final String STACK_TAG_NAME = "<row";
 
+    public static final String REGEX_FILTER = "bra[sz]il";
+
 
     public static Map<String, String> extractAttributesFromXmlTagIntoMap(InputStream input, String tagName) throws XMLStreamException {
 

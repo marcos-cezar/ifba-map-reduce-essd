@@ -9,7 +9,9 @@ import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
+import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayInputStream;
@@ -26,12 +28,20 @@ import java.util.Map;
  */
 public class TopTenBrazilianPosters extends Configured implements Tool {
 
+    public static void main(String[] args) throws Exception {
+        TopTenBrazilianPosters topTen = new TopTenBrazilianPosters();
+        int runResult = ToolRunner.run(topTen, args);
+
+        System.exit(runResult);
+
+    }
+
     @Override
     public int run(String[] args) throws Exception {
 
 
         if (args.length < 3) {
-            System.out.println("TopTenBrazilianPosters deve ser utilizado assim: TopTenBrazilianPosters <in file> <out folder>");
+            System.out.println("TopTenBrazilianPosters deve ser utilizado assim: TopTenBrazilianPosters <in file Users> <in file Posts> <output folder>");
             System.exit(1);
         }
 
@@ -40,15 +50,23 @@ public class TopTenBrazilianPosters extends Configured implements Tool {
 
         job.setJobName(getClass().getName());
         job.setJarByClass(TopTenBrazilianPosters.class);
+
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
+        job.setOutputKeyClass(Text.class);
+        job.setOutputValueClass(Text.class);
 
-//        MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, );
-//        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, );
+        MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, BrazilianUsersMapper.class);
+        MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, PostsJoinMapper.class);
 
+        job.setReducerClass(BrazilianUsersReducer.class);
 
-        return 0;
+        FileOutputFormat.setOutputPath(job, new Path(args[2]));
+
+        boolean result = job.waitForCompletion(true);
+
+        return result ? 0 : 1;
     }
 
 }

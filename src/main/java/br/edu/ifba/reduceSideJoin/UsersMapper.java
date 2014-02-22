@@ -17,7 +17,7 @@ import java.util.Map;
  * Time: 21:22
  * To change this template use File | Settings | File Templates.
  */
-public class BrazilianUsersMapper extends Mapper<Object, Text, Text, Text> {
+public class UsersMapper extends Mapper<Object, Text, Text, Text> {
 
 
     private Text outKey = new Text();
@@ -37,7 +37,7 @@ public class BrazilianUsersMapper extends Mapper<Object, Text, Text, Text> {
             System.out.println(e.getMessage());
         }
 
-        if (mappedAttributes.containsKey("UserId")) {
+        if (mappedAttributes.containsKey("OwnerUserId")) {
             if (mappedAttributes.containsKey("Location") && mappedAttributes.get("Location").matches(InformationExtractorUtils.REGEX_FILTER)) {
 
                 outKey.set(mappedAttributes.get("UserId"));

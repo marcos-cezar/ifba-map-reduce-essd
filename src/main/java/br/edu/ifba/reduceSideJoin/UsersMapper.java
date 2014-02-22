@@ -38,13 +38,11 @@ public class UsersMapper extends Mapper<Object, Text, Text, Text> {
         }
 
         if (mappedAttributes.containsKey("OwnerUserId")) {
-            if (mappedAttributes.containsKey("Location") && mappedAttributes.get("Location").matches(InformationExtractorUtils.REGEX_FILTER)) {
 
-                outKey.set(mappedAttributes.get("UserId"));
-                outValue.set("U" + value.toString());
+            outKey.set(mappedAttributes.get("UserId"));
+            outValue.set("U" + value.toString());
 
-                context.write(outKey, outValue);
-            }
+            context.write(outKey, outValue);
         }
 
     }

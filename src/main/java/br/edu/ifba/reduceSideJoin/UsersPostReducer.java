@@ -16,7 +16,6 @@ import java.util.Iterator;
  */
 public class UsersPostReducer extends Reducer<Text, Text, Text, Text> {
 
-    private static final Text EMPTY_LIST = new Text("");
 
     private ArrayList<Text> listA = new ArrayList<Text>();
     private ArrayList<Text> listB = new ArrayList<Text>();

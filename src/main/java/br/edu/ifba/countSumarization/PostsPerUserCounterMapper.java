@@ -19,35 +19,37 @@ public class PostsPerUserCounterMapper extends Mapper<Object, Text, Text, IntWri
 
     private static final IntWritable one = new IntWritable(1);
     private Text word = new Text("");
-    private String bufferValue = "";
+    private String lastKeyPost = "";
 
 
     @Override
     protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
+        System.out.println("PostsPerUserCounterMapper.map()");
+        System.out.println("Chave: " + key);
+        System.out.println("Valor: " + value);
 
         StringTokenizer tokenizer = new StringTokenizer(value.toString());
 
+        StringBuffer bufferValue = new StringBuffer("");
         while (tokenizer.hasMoreTokens()) {
+
             final String token = tokenizer.nextElement().toString();
 
-            if (StringUtils.isNumeric(token)) {
+            if (!StringUtils.isNumeric(token)) {
 
-                if (bufferValue.equalsIgnoreCase(token)) {
-                    context.write(word, one);
-                }
-                bufferValue = token;
+                bufferValue.append(token + " ");
 
             } else {
 
-                if (!word.equals("")) {
-                    word.set(word + " " + token);
-                } else {
-                    word.set(token);
-                }
-
+                System.out.println("Token atual: " + token);
+                System.out.println("Nome a ser atribuido: " + bufferValue.toString().trim());
+                word.set(new Text(bufferValue.toString().trim()));
+                context.write(word, one);
             }
 
         }
+
+
 
     }
 }

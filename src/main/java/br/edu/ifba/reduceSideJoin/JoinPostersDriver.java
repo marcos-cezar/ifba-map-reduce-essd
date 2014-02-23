@@ -2,9 +2,7 @@ package br.edu.ifba.reduceSideJoin;
 
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -19,10 +17,10 @@ import org.apache.hadoop.util.ToolRunner;
  * Time: 15:28
  * To change this template use File | Settings | File Templates.
  */
-public class TopTenBrazilianPosters extends Configured implements Tool {
+public class JoinPostersDriver extends Configured implements Tool {
 
     public static void main(String[] args) throws Exception {
-        TopTenBrazilianPosters topTen = new TopTenBrazilianPosters();
+        JoinPostersDriver topTen = new JoinPostersDriver();
         int runResult = ToolRunner.run(topTen, args);
 
         System.exit(runResult);
@@ -33,13 +31,13 @@ public class TopTenBrazilianPosters extends Configured implements Tool {
     public int run(String[] args) throws Exception {
 
         if (args.length < 3) {
-            System.out.println("TopTenBrazilianPosters deve ser utilizado assim: TopTenBrazilianPosters <in file Users> <in file Posts> <output folder>");
+            System.out.println("JoinPostersDriver deve ser utilizado assim: JoinPostersDriver <in file Users> <in file Posts> <output folder>");
             System.exit(1);
         }
 
         Job job = new Job(getConf(), "Reduce Side Join");
 
-        job.setJarByClass(TopTenBrazilianPosters.class);
+        job.setJarByClass(JoinPostersDriver.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
@@ -53,7 +51,7 @@ public class TopTenBrazilianPosters extends Configured implements Tool {
 
         /*Job jobSumarization = new Job(getConf(), "Job Count Sumarization");
 
-        jobSumarization.setJarByClass(TopTenBrazilianPosters.class);
+        jobSumarization.setJarByClass(JoinPostersDriver.class);
         jobSumarization.setOutputKeyClass(TextInputFormat.class);
         jobSumarization.setOutputValueClass(IntWritable.class);
 

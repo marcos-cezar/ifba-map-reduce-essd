@@ -3,6 +3,7 @@ package br.edu.ifba.countSumarization;
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -41,6 +42,10 @@ public class CountSumarizationDriver extends Configured implements Tool {
         job.setJobName(this.getClass().getName());
         job.setJarByClass(CountSumarizationDriver.class);
         job.setMapperClass(PostsPerUserCounterMapper.class);
+
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+
 
         job.setOutputKeyClass(TextInputFormat.class);
         job.setOutputValueClass(IntWritable.class);

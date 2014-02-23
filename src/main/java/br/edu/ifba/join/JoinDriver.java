@@ -27,21 +27,26 @@ public class JoinDriver extends Configured implements Tool {
             System.err.println("O Programa deve ser usado assim: JoinDriver <in> <in> <out>");
             System.exit(2);
         }
-
+        
 		Job job = new Job(this.getConf());
         job.setJobName(this.getClass().getName());
         job.setJarByClass(JoinDriver.class);
+        
+        job.setMapOutputKeyClass(Text.class);
+        job.setMapOutputValueClass(Text.class);
+        
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
-
-        job.setReducerClass(JoinReducer.class);
         
         MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, JoinUserMapper.class);
 		MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, JoinPostMapper.class);
+		
+		job.setReducerClass(JoinReducer.class);
+		
 		FileOutputFormat.setOutputPath(job, new Path(args[2]));
 		
         boolean success = job.waitForCompletion(true);
-
-        return success ? 0 : 1;  //To change body of implemented methods use File | Settings | File Templates.
+        
+        return success ? 0 : 1;  
 	}
 }

@@ -17,7 +17,7 @@ public class JoinReducer extends Reducer <Text, Text, Text, Text>{
 	protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 		this.userList.clear();
 		this.postList.clear();
-
+        
 		Iterator<Text> it = values.iterator();
 		while(it.hasNext()) {
 			this.tmp = it.next();
@@ -28,13 +28,12 @@ public class JoinReducer extends Reducer <Text, Text, Text, Text>{
 				this.postList.add(new Text(this.tmp.toString().substring(1)));
 			}
 		}
-
+        
 		//		if(this.joinType.equalsIgnoreCase("inner")) {
 		if(!this.userList.isEmpty() && !this.postList.isEmpty()) {
-			for(Text post : this.postList) {
-				for(Text user : this.userList) {
-					user.set(key + ", " + user);
-					context.write(user, post);
+			for(Text user : this.userList) {
+				for(Text post : this.postList) {
+					context.write(new Text(key + ", " + user), post);
 				}
 			}
 		}

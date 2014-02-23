@@ -14,7 +14,7 @@ import java.util.Iterator;
  * Time: 23:42
  * To change this template use File | Settings | File Templates.
  */
-public class BrazilianUsersReducer extends Reducer<Text, Text, Text, Text> {
+public class UsersPostReducer extends Reducer<Text, Text, Text, Text> {
 
     private static final Text EMPTY_LIST = new Text("");
 
@@ -35,8 +35,8 @@ public class BrazilianUsersReducer extends Reducer<Text, Text, Text, Text> {
         listA.clear();
         listB.clear();
 
-
         for (java.util.Iterator<Text> it = values.iterator(); it.hasNext(); ) {
+
             Text element =  it.next();
 
             if (element.charAt(0) == 'U') {
@@ -46,8 +46,8 @@ public class BrazilianUsersReducer extends Reducer<Text, Text, Text, Text> {
             }
 
             executeJoinLogic(context);
-
         }
+
 
     }
 

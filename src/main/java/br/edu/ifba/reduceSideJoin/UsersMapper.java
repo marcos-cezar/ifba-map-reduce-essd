@@ -25,22 +25,26 @@ public class UsersMapper extends Mapper<Object, Text, Text, Text> {
 
     @Override
     protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-
+        System.out.println("UsersMapper.map()");
         String line = value.toString();
         Map<String, String> mappedAttributes = new HashMap<String, String>();
 
         try {
             if (line.contains(InformationExtractorUtils.STACK_TAG_NAME)) {
-                mappedAttributes = InformationExtractorUtils.extractAttributesFromXmlTagIntoMap(new ByteArrayInputStream(line.getBytes()), InformationExtractorUtils.STACK_TAG_NAME);
+                mappedAttributes = InformationExtractorUtils.extractAttributesFromXmlTagIntoMap(new
+                        ByteArrayInputStream(line.getBytes()), InformationExtractorUtils.STACK_CANNONICAL_TAG_NAME);
             }
         } catch (XMLStreamException e) {
             System.out.println(e.getMessage());
         }
 
-        if (mappedAttributes.containsKey("OwnerUserId")) {
+        final String keyName = "Id";
+        if (mappedAttributes.containsKey(keyName)) {
 
-            outKey.set(mappedAttributes.get("UserId"));
-            outValue.set("U" + value.toString());
+            System.out.println("chave: " + mappedAttributes.get(keyName));
+            outKey.set(mappedAttributes.get(keyName));
+            System.out.println("valor: " + mappedAttributes.get("DisplayName"));
+            outValue.set("U" + mappedAttributes.get("DisplayName"));
 
             context.write(outKey, outValue);
         }

@@ -2,7 +2,9 @@ package br.edu.ifba.reduceSideJoin;
 
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
+import org.apache.hadoop.mapred.FileInputFormat;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.MultipleInputs;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
@@ -30,28 +32,33 @@ public class TopTenBrazilianPosters extends Configured implements Tool {
     @Override
     public int run(String[] args) throws Exception {
 
-
         if (args.length < 3) {
             System.out.println("TopTenBrazilianPosters deve ser utilizado assim: TopTenBrazilianPosters <in file Users> <in file Posts> <output folder>");
             System.exit(1);
         }
 
+        Job job = new Job(getConf(), "Reduce Side Join");
 
-        Job job = new Job();
-
-        job.setJobName(getClass().getName());
         job.setJarByClass(TopTenBrazilianPosters.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(Text.class);
 
-        job.setOutputKeyClass(Text.class);
-        job.setOutputValueClass(Text.class);
 
         MultipleInputs.addInputPath(job, new Path(args[0]), TextInputFormat.class, UsersMapper.class);
         MultipleInputs.addInputPath(job, new Path(args[1]), TextInputFormat.class, PostsJoinMapper.class);
 
-        job.setReducerClass(BrazilianUsersReducer.class);
+//        job.setNumReduceTasks(2);
+        job.setReducerClass(UsersPostReducer.class);
+
+        /*Job jobSumarization = new Job(getConf(), "Job Count Sumarization");
+
+        jobSumarization.setJarByClass(TopTenBrazilianPosters.class);
+        jobSumarization.setOutputKeyClass(TextInputFormat.class);
+        jobSumarization.setOutputValueClass(IntWritable.class);
+
+        FileInputFormat.addInputPath(getConf(), new Path());*/
+
 
         FileOutputFormat.setOutputPath(job, new Path(args[2]));
 

@@ -24,7 +24,7 @@ public class PostsJoinMapper extends Mapper<Object, Text, Text, Text> {
 
     @Override
     protected void map(Object key, Text value, Context context) throws IOException, InterruptedException {
-        System.out.println("PostsMapper.map()");
+        System.out.println("PostsJoinMapper.map()");
         String linha = value.toString();
 
         System.out.println("Linha lida: " + linha);
@@ -34,10 +34,11 @@ public class PostsJoinMapper extends Mapper<Object, Text, Text, Text> {
             if (linha.contains(InformationExtractorUtils.STACK_TAG_NAME)) {
 
                 Map<String, String> mappedAttributesFromXml = InformationExtractorUtils
-                        .extractAttributesFromXmlTagIntoMap(new ByteArrayInputStream(linha.getBytes()), InformationExtractorUtils.STACK_TAG_NAME);
+                        .extractAttributesFromXmlTagIntoMap(new ByteArrayInputStream(linha.getBytes()),
+                                InformationExtractorUtils.STACK_CANNONICAL_TAG_NAME);
 
 
-                final String userId = "UserId";
+                final String userId = "OwnerUserId";
 
                 if (mappedAttributesFromXml.containsKey(userId)) {
 
@@ -45,8 +46,8 @@ public class PostsJoinMapper extends Mapper<Object, Text, Text, Text> {
 
                     System.out.println("Chave a ser setada -> " + userIdAttr);
                     outKey.set(userIdAttr);
-                    System.out.println("Valor a ser setado -> " + linha);
-                    outValue.set("P" + linha);
+                    System.out.println("Valor a ser setado -> " + "P" + mappedAttributesFromXml.get("Id"));
+                    outValue.set("P" + mappedAttributesFromXml.get("Id"));
 
                     context.write(outKey, outValue);
                 }

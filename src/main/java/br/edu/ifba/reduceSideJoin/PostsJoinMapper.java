@@ -40,7 +40,7 @@ public class PostsJoinMapper extends Mapper<Object, Text, Text, Text> {
 
                 final String userId = "OwnerUserId";
 
-                if (mappedAttributesFromXml.containsKey(userId)) {
+                if (mappedAttributesFromXml.containsKey(userId) && mappedAttributesFromXml.containsKey("Id")) {
 
                     String userIdAttr = mappedAttributesFromXml.get(userId);
 

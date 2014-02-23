@@ -39,11 +39,12 @@ public class UsersMapper extends Mapper<Object, Text, Text, Text> {
         }
 
         final String keyName = "Id";
-        if (mappedAttributes.containsKey(keyName)) {
+        if (mappedAttributes.containsKey(keyName) && mappedAttributes.containsKey("DisplayName")) {
 
             System.out.println("chave: " + mappedAttributes.get(keyName));
             outKey.set(mappedAttributes.get(keyName));
             System.out.println("valor: " + mappedAttributes.get("DisplayName"));
+
             outValue.set("U" + mappedAttributes.get("DisplayName"));
 
             context.write(outKey, outValue);

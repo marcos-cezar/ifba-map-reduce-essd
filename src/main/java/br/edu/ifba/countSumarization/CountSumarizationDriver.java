@@ -44,7 +44,7 @@ public class CountSumarizationDriver extends Configured implements Tool {
         job.setMapperClass(PostsPerUserCounterMapper.class);
 
         job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
+        job.setMapOutputValueClass(IntWritable.class);
 
 
         job.setOutputKeyClass(TextInputFormat.class);
